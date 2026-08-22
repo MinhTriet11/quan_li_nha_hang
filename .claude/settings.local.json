@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php -l app/Http/Controllers/Admin/ReportController.php)",
+      "Bash(php artisan *)",
+      "Bash(php -r 'require '\\\\''vendor/autoload.php'\\\\''; $app = require '\\\\''bootstrap/app.php'\\\\''; $app->make\\('\\\\''Illuminate\\\\Contracts\\\\Console\\\\Kernel'\\\\''\\)->bootstrap\\(\\); foreach \\(['\\\\''admin/pages/reports_index'\\\\'', '\\\\''admin/pages/report_combined'\\\\'', '\\\\''admin/pages/report_revenue'\\\\'', '\\\\''admin/pages/report_best_selling'\\\\'', '\\\\''admin/pages/report_ingredients'\\\\'', '\\\\''admin/partials/footer_admin'\\\\''] as $v\\) { $contents = file_get_contents\\(resource_path\\('\\\\''views/'\\\\'' . $v . '\\\\''.blade.php'\\\\''\\)\\); $compiler = app\\('\\\\''blade.compiler'\\\\''\\); $compiled = $compiler->compileString\\($contents\\); echo $v . '\\\\'' OK '\\\\'' . strlen\\($compiled\\) . '\\\\'' bytes'\\\\'' . PHP_EOL; }')"
+    ]
+  }
+}
