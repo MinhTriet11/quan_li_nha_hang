@@ -65,7 +65,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-4">
+                            {{-- <div class="mt-4">
                                 @if($book->status == 0 || $book->status == 1)
                                     <a href="{{ route('admin.book.edit', $book->id_book) }}" class="btn btn-primary">
                                         <i class="fas fa-edit mr-1"></i> Sửa
@@ -90,7 +90,7 @@
                                 <a href="{{ route('admin.book') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left mr-1"></i> Quay lại
                                 </a>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
 

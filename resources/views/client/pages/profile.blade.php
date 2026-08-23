@@ -20,9 +20,9 @@
                         </div>
                         <h5 class="mb-1">{{ $customer->name }}</h5>
                         <p class="text-muted small mb-3">{{ $customer->email }}</p>
-                        <span class="badge bg-warning text-dark fs-6">
+                        {{-- <span class="badge bg-warning text-dark fs-6">
                             <i class="fa-solid fa-star me-1"></i>1,250 điểm
-                        </span>
+                        </span> --}}
                     </div>
                 </div>
 
@@ -124,7 +124,7 @@
 
                     <!-- Lịch sử đặt bàn -->
                     <div class="tab-pane fade" id="bookings">
-                        <div class="card border-0 shadow-sm">
+                        <div class="card border-0">
                             <div class="card-header bg-white border-0 pb-0">
                                 <h4 class="mb-1">Lịch sử đặt bàn</h4>
                                 <p class="text-muted mb-0">Xem lịch sử đặt bàn của bạn</p>
@@ -197,9 +197,11 @@
                                         </div>
                                     </div>
                                 @empty
-                                    <div class="text-center py-4 text-muted">
-                                        <i class="fa-solid fa-calendar-xmark fs-1 mb-2"></i>
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-body text-center py-5 text-muted">
+                                            <i class="fa-solid fa-calendar-xmark fs-1 mb-2"></i>
                                         <p class="mb-0">Bạn chưa có lịch sử đặt bàn nào.</p>
+                                        </div>
                                     </div>
                                 @endforelse
                             </div>

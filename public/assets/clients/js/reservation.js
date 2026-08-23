@@ -11,7 +11,6 @@ export function reservation() {
     const reservationTablesHint = document.getElementById("reservationTablesHint",);
     const reservationTablesList = document.getElementById("reservationTablesList",);
     const reservationHoldNotice = document.getElementById("reservationHoldNotice",);
-    const reservationHoldTimer = document.getElementById("reservationHoldTimer",);
     const reservationTableInput = document.getElementById("reservationTable");
     const reservationNameInput = document.getElementById("reservationName");
     const reservationPhoneInput = document.getElementById("reservationPhone");
@@ -21,22 +20,22 @@ export function reservation() {
 
     // Lay danh sach cac khung gio da bi chiem (anh huong cua booking khac trong cung chi nhanh).
     // Moi booking chiem 2 gio quanh no, nen booking luc 18h se chan ca 16h, 17h, 19h, 20h.
-    let bookedSlots = [];
+    // let bookedSlots = [];
 
-    async function fetchBookedSlots(branchId, date) {
-        if (!branchId || !date) {
-            bookedSlots = [];
-            return;
-        }
-        try {
-            const res = await fetch(`/book/booked-slots?branch=${branchId}&date=${date}`);
-            const data = await res.json();
-            bookedSlots = data.slots || [];
-        } catch (e) {
-            console.error("Error fetching booked slots:", e);
-            bookedSlots = [];
-        }
-    }
+    // async function fetchBookedSlots(branchId, date) {
+    //     if (!branchId || !date) {
+    //         bookedSlots = [];
+    //         return;
+    //     }
+    //     try {
+    //         const res = await fetch(`/book/booked-slots?branch=${branchId}&date=${date}`);
+    //         const data = await res.json();
+    //         bookedSlots = data.slots || [];
+    //     } catch (e) {
+    //         console.error("Lỗi khi lấy dữ liệu các khung giờ đã đặt:", e);
+    //         bookedSlots = [];
+    //     }
+    // }
 
     // Tao option cho mot khung gio, disable neu no trung bookedSlot hoac qua gio hien tai (ngay hom nay).
     // function buildTimeOption(value) {
@@ -73,7 +72,7 @@ export function reservation() {
         }
 
         // Lay bookedSlots truoc khi render option
-        await fetchBookedSlots(branchId, selectedDate);
+        //await fetchBookedSlots(branchId, selectedDate);
 
         if (selectedDate === today) {
             const now = new Date();
@@ -125,7 +124,7 @@ export function reservation() {
                     return;
                 }
 
-                reservationTablesHint.innerHTML = `Có <strong>${data.data.length}</strong> loại bàn trống. Chọn một bàn để giữ trong 5 phút.`;
+                reservationTablesHint.innerHTML = `Có <strong>${data.data.length}</strong> loại bàn trống. Vui lòng chọn một bàn.`;
 
                 // Render tat ca cac ban
                 data.data.forEach((table) => {
@@ -148,7 +147,6 @@ export function reservation() {
                         allCards.forEach((card) => card.classList.remove("selected"));
 
                         this.classList.add("selected");
-                        startTableHold();
                     });
 
                     reservationTablesList.appendChild(button);
@@ -175,19 +173,9 @@ export function reservation() {
         });
     }
 
-    let holdTimer = null;
-    let holdDeadline = null;
-
     function clearTableHold() {
-        if (holdTimer) {
-            clearInterval(holdTimer);
-            holdTimer = null;
-        }
         if (reservationHoldNotice) {
             reservationHoldNotice.classList.add("hidden");
-        }
-        if (reservationHoldTimer) {
-            reservationHoldTimer.textContent = "05:00";
         }
         if (reservationTableInput) {
             reservationTableInput.value = "";
@@ -197,34 +185,6 @@ export function reservation() {
                 .querySelectorAll(".reservation-table-card")
                 .forEach((card) => card.classList.remove("selected"));
         }
-    }
-
-    //đếm ngược thời gian giữ bàn
-    function startTableHold() {
-        if (!reservationHoldNotice || !reservationHoldTimer) return;
-
-        holdDeadline = Date.now() + 300000; //300000 = 5 phut (1000 = 1s)
-        reservationHoldNotice.classList.remove("hidden");
-        reservationHoldTimer.textContent = "05:00";
-
-        holdTimer = setInterval(() => {
-            const remainingSeconds = Math.max(
-                0,
-                Math.ceil((holdDeadline - Date.now()) / 1000),
-            );
-            reservationHoldTimer.textContent = formatHoldTime(remainingSeconds);
-
-            if (remainingSeconds === 0) {
-                clearTableHold();
-            }
-        }, 1000); //1s lặp lại 1 lần
-    }
-
-    //chuyen so giay sang dang phut:giay
-    function formatHoldTime(seconds) {
-        const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
-        const secs = String(seconds % 60).padStart(2, "0");
-        return `${minutes}:${secs}`;
     }
 
     function openReservation() {

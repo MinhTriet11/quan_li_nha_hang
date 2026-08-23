@@ -30,18 +30,22 @@
                             <option value="{{ $value->id_br }}">{{ $value->name }}</option>
                         @endforeach
                     </select>
+                    <span class="form-message"></span>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="reservationDate">Ngày đặt</label>
                         <input type="date" id="reservationDate" name="date" rules="required" min="{{ date('Y-m-d') }}">
+                        <span class="form-message"></span>
                     </div>
                     <div class="form-group">
                         <label for="reservationTime">Giờ đặt</label>
                         <select id="reservationTime" name="time" rules="required" disabled>
                             <option value="" disabled selected>Chọn giờ</option>
                         </select>
+                        <span class="form-message"></span>
                     </div>
+                    
                 </div>
                 <div class="form-group reservation-tables-group">
                     <label>Bàn khả dụng</label>

@@ -103,7 +103,7 @@
                         <input type="email" class="form-control"  name="email" rules="required|email" placeholder="you@example.com">
                         <span class="form-message"></span>
                     </div>
-                    <button  class="auth-btn">Gửi liên kết</button>  
+                    <button class="auth-btn">Gửi liên kết</button>  
                     </form>
                 </div>
 

@@ -284,15 +284,15 @@ class AdminBookController extends Controller
             $newStatus = $request->status;
 
             // Không cho thay đổi trạng thái nếu đã hoàn thành (3)
-            if ($currentStatus == 3) {
+            if ($currentStatus == 2) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Đơn đặt bàn đã hoàn thành, không thể thay đổi',
                 ]);
             }
 
-            // Không cho thay đổi trạng thái nếu đã hủy (2), trừ khi khôi phục về Holding (0)
-            if ($currentStatus == 2 && $newStatus != 0) {
+            // Không cho thay đổi trạng thái nếu đã hủy (3), trừ khi khôi phục về Holding (0)
+            if ($currentStatus == 3 && $newStatus != 0) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Đơn đặt bàn đã hủy, không thể thay đổi (chỉ có thể khôi phục về trạng thái chờ)',
@@ -344,7 +344,7 @@ class AdminBookController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Cập nhật đặt bàn thành công',
-                    'redirect' => route('admin.book.edit', $id)
+                    'redirect' => $request->status == 0 || $request->status == 1 ? route('admin.book.edit', $id) : route('admin.book')
                 ]);
             } else {
                 return response()->json([
