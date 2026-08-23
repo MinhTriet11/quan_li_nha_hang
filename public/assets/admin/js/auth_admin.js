@@ -98,6 +98,15 @@ function validatorRules(formElement , url = '', type = '') {
         }
 
         function handleValidate(event) {
+            // Bỏ qua khi input bị disable hoặc được đánh dấu skip (vd: dropdown chi nhánh theo role)
+            if (event.target.disabled || event.target.dataset && event.target.dataset.noValidate === '1') {
+                var formGroup = getParent(event.target, ".form-group");
+                if (formGroup) formGroup.classList.remove("invalid");
+                var fm = formGroup ? formGroup.querySelector(".form-message") : null;
+                if (fm) fm.innerText = "";
+                return true;
+            }
+
             var rules = formRules[event.target.name];
             var errorMessage;
 
@@ -142,6 +151,9 @@ function validatorRules(formElement , url = '', type = '') {
             var isValid = true;
 
             for (var input of inputs) {
+                // Bỏ qua input disabled hoặc được đánh dấu skip
+                if (input.disabled) continue;
+                if (input.dataset && input.dataset.noValidate === '1') continue;
                 if (!handleValidate({ target: input })) {
                     isValid = false;
                 }

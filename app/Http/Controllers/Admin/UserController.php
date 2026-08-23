@@ -12,6 +12,24 @@ use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
+    /**
+     * Danh sách các role code mà nhân viên BẮT BUỘC phải gán chi nhánh.
+     * (manager, chef, staff, waiter, cashier, …)
+     *
+     * Lưu ý: phải khớp với `codeMap` ở view user_create / user_edit.
+     */
+    public const REQUIRED_BRANCH_ROLE_CODES = ['manager', 'chef', 'staff', 'waiter', 'cashier'];
+
+    /**
+     * Kiểm tra id_role có thuộc nhóm bắt buộc chi nhánh hay không.
+     */
+    protected function roleRequiresBranch($idRole): bool
+    {
+        $codeMap = [1 => 'admin', 2 => 'manager', 3 => 'staff', 4 => 'chef', 5 => 'warehouse', 6 => 'waiter'];
+        $code = $codeMap[(int) $idRole] ?? '';
+        return in_array($code, self::REQUIRED_BRANCH_ROLE_CODES, true);
+    }
+
     public function index(Request $request)
     {
         $query = User::with(['branch', 'role'])
@@ -52,12 +70,14 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
+            $requiresBranch = $this->roleRequiresBranch($request->id_role);
+
             $request->validate([
                 'name'     => 'required|string|max:255',
                 'email'    => 'required|email|max:255|unique:users,email',
                 'phone'    => 'nullable|string|max:20',
                 'address'  => 'nullable|string|max:255',
-                'id_br'    => 'nullable|exists:branches,id_br',
+                'id_br'    => [$requiresBranch ? 'required' : 'nullable', 'exists:branches,id_br'],
                 'id_role'  => 'required|exists:roles,id_role',
                 'password' => 'required|string|min:6|confirmed',
                 'status'   => 'required|in:0,1',
@@ -69,6 +89,7 @@ class UserController extends Controller
                 'password.required'  => 'Mật khẩu là bắt buộc',
                 'password.min'       => 'Mật khẩu tối thiểu 6 ký tự',
                 'password.confirmed' => 'Mật khẩu xác nhận không khớp',
+                'id_br.required'     => 'Chức vụ này bắt buộc phải chọn chi nhánh',
                 'id_br.exists'       => 'Chi nhánh không hợp lệ',
                 'id_role.required'   => 'Vui lòng chọn chức vụ',
                 'id_role.exists'     => 'Chức vụ không hợp lệ',
@@ -126,12 +147,14 @@ class UserController extends Controller
         try {
             $user = User::findOrFail($id);
 
+            $requiresBranch = $this->roleRequiresBranch($request->id_role);
+
             $rules = [
                 'name'    => 'required|string|max:255',
                 'email'   => 'required|email|max:255|unique:users,email,' . $id . ',id_user',
                 'phone'   => 'nullable|string|max:20',
                 'address' => 'nullable|string|max:255',
-                'id_br'   => 'nullable|exists:branches,id_br',
+                'id_br'   => [$requiresBranch ? 'required' : 'nullable', 'exists:branches,id_br'],
                 'id_role' => 'required|exists:roles,id_role',
                 'status'  => 'required|in:0,1',
             ];
@@ -147,6 +170,7 @@ class UserController extends Controller
                 'email.unique'         => 'Email đã tồn tại',
                 'password.min'         => 'Mật khẩu tối thiểu 6 ký tự',
                 'password.confirmed'   => 'Mật khẩu xác nhận không khớp',
+                'id_br.required'       => 'Chức vụ này bắt buộc phải chọn chi nhánh',
                 'id_br.exists'         => 'Chi nhánh không hợp lệ',
                 'id_role.required'     => 'Vui lòng chọn chức vụ',
                 'id_role.exists'       => 'Chức vụ không hợp lệ',

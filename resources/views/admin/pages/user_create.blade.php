@@ -66,15 +66,19 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="id_br">Chi nhánh</label>
-                                            <select class="form-control" id="id_br" name="id_br">
+                                            <label for="id_br">
+                                                Chi nhánh
+                                                <span class="text-danger d-none" id="id_br_required_mark">*</span>
+                                            </label>
+                                            <select class="form-control" id="id_br" name="id_br" rules="required">
                                                 <option value="">-- Chọn chi nhánh --</option>
                                                 @foreach($branches as $branch)
                                                     <option value="{{ $branch->id_br }}">{{ $branch->name }}</option>
                                                 @endforeach
                                             </select>
-                                            <small class="form-text text-muted" id="id_br_hint" style="display:none;">
-                                                <i class="fas fa-info-circle"></i> Chức vụ <strong id="id_br_hint_role">này</strong> không cần gán chi nhánh cụ thể.
+                                            <span class="form-message" id="id_br_error"></span>
+                                            <small class="form-text text-muted" id="id_br_hint_optional" style="display:none;">
+                                                <i class="fas fa-info-circle"></i> Chức vụ <strong id="id_br_hint_optional_role">này</strong> không cần gán chi nhánh cụ thể.
                                             </small>
                                         </div>
                                     </div>
@@ -132,78 +136,93 @@
 
 @section('js')
 <script>
-// Disable dropdown chi nhánh khi chọn chức vụ admin hoặc quản lý kho (warehouse)
+// Đồng bộ trạng thái dropdown chi nhánh theo chức vụ:
+//   - admin / warehouse : không bắt buộc -> disable + skip validate + gợi ý "không cần"
+//   - manager/chef/staff/waiter/cashier : bắt buộc -> validate required + hiển thị lỗi inline giống các ô khác
+//   - các role khác : tuỳ chọn (không required)
+//
+// Cơ chế: dùng `dataset.noValidate = '1'` để framework validatorRules skip,
+// và đăng ký submit listener ở CAPTURE phase để chạy validate TRƯỚC framework.
 (function () {
-    const roleSelect = document.getElementById('id_role');
+    const form         = document.getElementById('formCreateUser');
+    const roleSelect   = document.getElementById('id_role');
     const branchSelect = document.getElementById('id_br');
-    const branchHint = document.getElementById('id_br_hint');
-    const branchHintRole = document.getElementById('id_br_hint_role');
-    if (!roleSelect || !branchSelect) return;
+    const requiredMark = document.getElementById('id_br_required_mark');
+    const hintOptional = document.getElementById('id_br_hint_optional');
+    const hintOptionalRole = document.getElementById('id_br_hint_optional_role');
+    const branchGroup  = branchSelect ? branchSelect.closest('.form-group') : null;
+    const branchMsg    = branchGroup ? branchGroup.querySelector('.form-message') : null;
+    if (!form || !roleSelect || !branchSelect) return;
 
-    // Các role_code KHÔNG cần gán chi nhánh
-    const NO_BRANCH_ROLES = ['admin', 'warehouse'];
+    const NO_BRANCH_ROLES  = ['admin', 'warehouse'];
+    const REQ_BRANCH_ROLES = ['manager', 'chef', 'staff', 'waiter', 'cashier'];
+    let branchRequiredNow  = false;
+
+    function clearBranchError() {
+        if (branchGroup) branchGroup.classList.remove('invalid');
+        if (branchMsg)   branchMsg.innerText = '';
+        branchSelect.classList.remove('is-invalid');
+    }
+
+    function showBranchError(msg) {
+        if (branchGroup) branchGroup.classList.add('invalid');
+        if (branchMsg)   branchMsg.innerText = msg;
+        branchSelect.classList.add('is-invalid');
+    }
 
     function syncBranchState() {
         const opt = roleSelect.options[roleSelect.selectedIndex];
         const code = opt ? (opt.getAttribute('data-code') || '') : '';
         const roleName = opt ? (opt.textContent || '').trim() : '';
 
-        if (NO_BRANCH_ROLES.includes(code)) {
-            branchSelect.value = '';
-            branchSelect.disabled = true;
-            branchSelect.classList.add('bg-light');
-            if (branchHint) {
-                branchHint.style.display = 'block';
-                if (branchHintRole) branchHintRole.textContent = roleName;
-            }
-        } else {
-            branchSelect.disabled = false;
-            branchSelect.classList.remove('bg-light');
-            if (branchHint) branchHint.style.display = 'none';
-        }
-    }
-
-    roleSelect.addEventListener('change', syncBranchState);
-    syncBranchState();
-})();
-</script>
-@endsection
-
-@section('js')
-<script>
-// Disable dropdown chi nhánh khi chọn chức vụ admin hoặc quản lý kho (warehouse)
-(function () {
-    const roleSelect = document.getElementById('id_role');
-    const branchSelect = document.getElementById('id_br');
-    const branchHint = document.getElementById('id_br_hint');
-    const branchHintRole = document.getElementById('id_br_hint_role');
-    if (!roleSelect || !branchSelect) return;
-
-    // Các role_code KHÔNG cần gán chi nhánh
-    const NO_BRANCH_ROLES = ['admin', 'warehouse'];
-
-    function syncBranchState() {
-        const opt = roleSelect.options[roleSelect.selectedIndex];
-        const code = opt ? (opt.getAttribute('data-code') || '') : '';
-        const roleName = opt ? (opt.textContent || '').trim() : '';
+        // Reset UI
+        branchSelect.disabled = false;
+        branchSelect.classList.remove('bg-light');
+        if (requiredMark) requiredMark.classList.add('d-none');
+        if (hintOptional) hintOptional.style.display = 'none';
+        clearBranchError();
 
         if (NO_BRANCH_ROLES.includes(code)) {
             branchSelect.value = '';
             branchSelect.disabled = true;
             branchSelect.classList.add('bg-light');
-            if (branchHint) {
-                branchHint.style.display = 'block';
-                if (branchHintRole) branchHintRole.textContent = roleName;
+            branchSelect.dataset.noValidate = '1'; // báo cho framework skip
+            branchRequiredNow = false;
+            if (hintOptional) {
+                hintOptional.style.display = 'block';
+                if (hintOptionalRole) hintOptionalRole.textContent = roleName;
+            }
+        } else if (REQ_BRANCH_ROLES.includes(code)) {
+            delete branchSelect.dataset.noValidate; // framework validate lại được
+            branchRequiredNow = true;
+            if (requiredMark) requiredMark.classList.remove('d-none');
+            if (!branchSelect.value) {
+                showBranchError('Vui lòng không bỏ trống');
             }
         } else {
-            branchSelect.disabled = false;
-            branchSelect.classList.remove('bg-light');
-            if (branchHint) branchHint.style.display = 'none';
+            delete branchSelect.dataset.noValidate;
+            branchSelect.classList.remove('border-danger');
+            branchRequiredNow = false;
         }
     }
 
+    branchSelect.addEventListener('change', clearBranchError);
     roleSelect.addEventListener('change', syncBranchState);
-    syncBranchState(); // chạy lần đầu khi edit (old value)
+    syncBranchState(); // chạy lần đầu
+
+    // ============== Intercept submit ==============
+    // Chạy ở capture phase để validate dropdown chi nhánh TRƯỚC framework validatorRules.
+    // Nếu thiếu chi nhánh -> showBranchError + ngăn submit.
+    form.addEventListener('submit', function (e) {
+        if (!branchRequiredNow) return; // role hiện tại không yêu cầu chi nhánh
+
+        if (!branchSelect.value) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            showBranchError('Vui lòng không bỏ trống');
+            branchSelect.focus();
+        }
+    }, true); // <-- capture: chạy trước các listener khác (kể cả framework)
 })();
 </script>
 @endsection
