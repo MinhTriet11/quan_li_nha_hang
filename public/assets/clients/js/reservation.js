@@ -76,7 +76,7 @@ export function reservation() {
 
         if (selectedDate === today) {
             const now = new Date();
-            let currentHour = now.getHours() + 2;
+            let currentHour = now.getHours() + 2; //dat truoc 2 tieng
 
             if (currentHour < 10) currentHour = 10;
             if (currentHour > 20) {

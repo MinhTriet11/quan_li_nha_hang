@@ -51,6 +51,7 @@ class InventoryForecastController extends Controller
                 $historyStart->toDateTimeString(),
                 $historyEnd->endOfDay()->toDateTimeString(),
             ])
+            ->where('status', 3)
             ->get();
 
         // 2. Tổng số lượng từng món trong lịch sử

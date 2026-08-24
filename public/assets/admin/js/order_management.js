@@ -93,7 +93,7 @@ function renderOrderDetails(order) {
         const itemTotal = item.quantity * item.price;
         subtotal += itemTotal;
         const statusClass = item.status == 2 ? 'served' : 'pending';
-        const statusText = item.status == 2 ? 'Đã xong' : 'Chờ chế biến';
+        const statusText = item.status == 2 ? 'Đã xong' : (item.status == 1 ? 'Đang chế biến' : 'Chờ chế biến');
         const imageUrl = item.menu_item?.image ? item.menu_item.image : '';
 
         itemsHtml += `
@@ -105,7 +105,7 @@ function renderOrderDetails(order) {
                     <div class="order-item-name">${item.menu_item?.name || 'Món ăn'}</div>
                     <div class="order-item-price">${formatPrice(item.price)} ₫</div>
                 </div>
-                ${ (item.status == 2) ? `<div class="order-item-quantity">
+                ${ (item.status == 2 || item.status == 1) ? `<div class="order-item-quantity">
                     <span class="quantity-value" >x${item.quantity}</span>
                 </div>` : `<div class="order-item-quantity">
                     <button class="quantity-btn" onclick="updateItemQuantity(${item.id_ordetail}, -1)">-</button>
@@ -200,6 +200,20 @@ function updateTableCard(tableId) {
 
 // ==================== Add Food Modal ====================
 function openAddFoodModal() {
+    const statusId = document.querySelectorAll('.order-item-status');
+    let isCooking = true;
+
+    statusId.forEach(status => {
+        if(status.dataset.statusId == 1){
+            isCooking = false;
+        }
+    })
+
+    if(!isCooking){
+        alert('Đơn đang chế biến, vui lòng thử lại sau');
+        return;
+    }
+    
     selectedMenuItems = [];
     document.getElementById('searchMenuItem').value = '';
 

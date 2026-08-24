@@ -250,8 +250,6 @@ class PermissionHelper
             self::MODULE_CUSTOMER,
             self::MODULE_EMPLOYEE,
             self::MODULE_ORDER,
-            self::MODULE_INVENTORY,
-            self::MODULE_REPORT,
         ],
         // Nhân viên phục vụ: dashboard + đặt bàn + khách hàng + gọi món
         'staff' => [
