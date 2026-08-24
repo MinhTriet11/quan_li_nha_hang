@@ -100,11 +100,12 @@ class BillController extends Controller
             })
             ->values();
 
-        $subtotal = $grouped->sum(fn ($d) => ((int) $d->quantity) * ((float) $d->price));
+        $subtotal = $grouped->sum(fn ($d) => ((int) $d->quantity) * ((float) $d->price)) ;
+        $discount_percent = $bill->discount_percent;
         $tax      = round($subtotal * 0.08, 2);
-        $total    = $subtotal + $tax;
+        $total    = $subtotal - $bill->discount_amount;
 
-        return view('admin.pages.bill_show', compact('bill', 'order', 'grouped', 'subtotal', 'tax', 'total'));
+        return view('admin.pages.bill_show', compact('bill', 'order', 'grouped', 'subtotal', 'tax', 'total', 'discount_percent'));
     }
 
     /**

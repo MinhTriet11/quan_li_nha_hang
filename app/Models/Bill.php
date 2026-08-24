@@ -17,6 +17,8 @@ class Bill extends Model
         'id_bill',
         'id_order',
         'total',
+        'discount_percent',
+        'discount_amount',
         'pay_method',
         'pay_time',
         'status'

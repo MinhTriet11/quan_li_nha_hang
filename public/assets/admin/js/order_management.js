@@ -213,7 +213,7 @@ function openAddFoodModal() {
         alert('Đơn đang chế biến, vui lòng thử lại sau');
         return;
     }
-    
+
     selectedMenuItems = [];
     document.getElementById('searchMenuItem').value = '';
 
@@ -720,8 +720,6 @@ function processPayment() {
     const orderId = document.getElementById('currentOrderId').value;
     const totalText = document.getElementById('paymentTotal').value;
     const total = parseFloat(totalText.replace(/[^\d]/g, '')) || 0;
-
-    console.log(paymentMethod);
 
     if (!orderId) {
         alert('Không có order để thanh toán');

@@ -180,17 +180,18 @@
                                 <span class="text-muted">Tạm tính</span>
                                 <strong>{{ number_format($subtotal, 0, ',', '.') }} ₫</strong>
                             </div>
-                            {{-- <div class="d-flex justify-content-between py-2">
-                                <span class="text-muted">Thuế VAT (8%)</span>
-                                <strong>{{ number_format($tax, 0, ',', '.') }} ₫</strong>
-                            </div> --}}
+                            
+                            <div class="d-flex justify-content-between py-2">
+                                <span class="text-muted">Giảm giá</span>
+                                <strong>{{ number_format($discount_percent, 0, ',', '.') }} %</strong>
+                            </div>
                             <hr class="my-2">
                             <div class="d-flex justify-content-between align-items-center py-2">
                                 <span class="h5 mb-0 font-weight-bold text-success">
                                     <i class="fas fa-coins mr-1"></i>TỔNG CỘNG
                                 </span>
                                 <span class="h4 mb-0 font-weight-bold text-success">
-                                    {{ number_format($subtotal, 0, ',', '.') }} ₫
+                                    {{ number_format($total, 0, ',', '.') }} ₫
                                 </span>
                             </div>
                         </div>

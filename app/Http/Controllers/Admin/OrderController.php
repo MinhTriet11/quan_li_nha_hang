@@ -16,6 +16,8 @@ use App\Models\TableTypes;
 use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class OrderController extends Controller
 {
@@ -537,11 +539,16 @@ class OrderController extends Controller
     // Thanh toán
     public function payment(Request $request)
     {
+        try{
+
         $request->validate([
             'order_id' => 'required|exists:orders,id_order',
             'customer_phone' => 'nullable|regex:/^(0[35789])[0-9]{8}$/',
+            'discount_percent' => 'nullable|numeric|min:0|max:100',
         ], [
             'customer_phone.regex' => 'Số điện thoại không hợp lệ',
+            'discount_percent.min' => 'Giảm giá phải từ 0% trở lên',
+            'discount_percent.max' => 'Giảm giá không được quá 100%',
         ]);
 
         $order = Order::findOrFail($request->order_id);
@@ -570,22 +577,43 @@ class OrderController extends Controller
             $table->save();
         }
 
+        // ==== Tính giảm giá ====
+        // $request->total ở đây là tổng gốc (subtotal) do FE gửi lên
+        $subtotal     = round((float) $request->total, 2);
+        $discountPct  = round((float) ($request->discount_percent ?? 0), 2);
+        $discountAmt  = round($subtotal * ($discountPct / 100), 2);
+        $finalTotal   = round($subtotal - $discountAmt, 2);
+
         // Tạo hóa đơn (Bill) - status = 2: đã thanh toán
         $bill = Bill::create([
-            'id_order'=> $request->order_id,
-            'total' => $request->total,
-            'pay_method' => $request->payment_method,
-            'pay_time' => Carbon::now(),
-            'status' => 2
+            'id_order'         => $request->order_id,
+            'total'            => $finalTotal,                  // tổng SAU khi giảm
+            'discount_percent' => $discountPct,                  // % giảm đã áp dụng
+            'discount_amount'  => $discountAmt,                  // số tiền được giảm
+            'pay_method'       => $request->payment_method,
+            'pay_time'         => Carbon::now(),
+            'status'           => 2,
         ]);
 
         return response()->json([
-            'success' => true,
-            'message' => 'Thanh toán thành công',
-            'id_cus' => $idCus,
-            'bill_id' => $bill->id_bill,
-            'redirect' => route('admin.bill.show', $bill->id_bill),
+            'success'        => true,
+            'message'        => 'Thanh toán thành công',
+            'id_cus'         => $idCus,
+            'bill_id'        => $bill->id_bill,
+            'subtotal'       => $subtotal,
+            'discount_percent' => $discountPct,
+            'discount_amount'  => $discountAmt,
+            'final_total'    => $finalTotal,
+            'redirect'       => route('admin.bill.show', $bill->id_bill),
         ]);
+
+        }catch(ValidationException $e){
+            return response()->json([
+            'error'        => true,
+            'message' =>   $e->getMessage()
+        ], 422);
+        }
+        
     }
 
     /**

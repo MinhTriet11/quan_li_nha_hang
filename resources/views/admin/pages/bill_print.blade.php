@@ -4,27 +4,30 @@
 
 @section('content')
     @php
-        $payLabel = match($bill->pay_method ?? '') {
-            'cash'     => 'TIEN MAT',
-            'card'     => 'THE',
+        $payLabel = match ($bill->pay_method ?? '') {
+            'cash' => 'TIEN MAT',
+            'card' => 'THE',
             'transfer' => 'CHUYEN KHOAN',
-            'qr'       => 'QR CODE',
-            default    => $bill->pay_method ? strtoupper($bill->pay_method) : '—',
+            'qr' => 'QR CODE',
+            default => $bill->pay_method ? strtoupper($bill->pay_method) : '—',
         };
 
         $storeName = $order->branch->name ?? 'NHA HANG';
         $storeAddr = $order->branch->address ?? '';
-        $isPaid    = $bill && (int) $bill->status !== 1;
+        $isPaid = $bill && (int) $bill->status !== 1;
 
-        $payTime = $bill && $bill->pay_time
-            ? \Carbon\Carbon::parse($bill->pay_time)
-            : ($order->order_time ? \Carbon\Carbon::parse($order->order_time) : \Carbon\Carbon::now());
+        $payTime =
+            $bill && $bill->pay_time
+                ? \Carbon\Carbon::parse($bill->pay_time)
+                : ($order->order_time
+                    ? \Carbon\Carbon::parse($order->order_time)
+                    : \Carbon\Carbon::now());
     @endphp
 
     {{-- ====== Tiêu đề nhà hàng ====== --}}
     <div class="center">
         <div class="store-name">{{ $storeName }}</div>
-        @if($storeAddr)
+        @if ($storeAddr)
             <div class="small">{{ $storeAddr }}</div>
         @endif
         <div class="small">Hotline: {{ $order->branch->phone ?? '—' }}</div>
@@ -36,7 +39,7 @@
         {{ $isPaid ? 'HOA DON BAN HANG' : 'PHIEU TAM TINH' }}
     </div>
     <div class="center small">
-        @if($bill)
+        @if ($bill)
             #HD{{ $bill->id_bill }}
         @else
             #{{ $order->id_order ?? '—' }}
@@ -59,7 +62,7 @@
         <span>Khach:</span>
         <span>{{ $order->customer->fullname ?? ($order->customer_name ?? '—') }}</span>
     </div>
-    @if($order->customer && $order->customer->phone)
+    @if ($order->customer && $order->customer->phone)
         <div class="info-line">
             <span>SDT:</span>
             <span>{{ $order->customer->phone }}</span>
@@ -85,7 +88,7 @@
                 @endphp
                 <tr>
                     <td class="item-name">
-                        {{ $detail->menuItem->name ?? ('Mon #' . $detail->id_food) }}
+                        {{ $detail->menuItem->name ?? 'Mon #' . $detail->id_food }}
                     </td>
                     <td class="qty">{{ (int) $detail->quantity }}</td>
                     <td class="price">{{ number_format((float) $detail->price, 0, ',', '.') }}</td>
@@ -107,17 +110,22 @@
             <span>Tam tinh:</span>
             <span>{{ number_format($subtotal, 0, ',', '.') }}</span>
         </div>
-        @if(!empty($bill) && (float) ($bill->discount_percent ?? 0) > 0)
+        @php
+            $discountPercent = (float) ($bill->discount_percent ?? 0);
+            $discountAmount = ($discountPercent / 100) * $subtotal;
+            $grandTotal = $subtotal - $discountAmount;
+        @endphp
+        @if (!empty($bill) && (float) ($bill->discount_percent ?? 0) > 0)
             <div class="row">
-                <span>Giam gia ({{ rtrim(rtrim(number_format((float) $bill->discount_percent, 1), '0'), '.') }}%):</span>
-                <span>-{{ number_format(((float) $bill->discount_percent / 100) * $subtotal, 0, ',', '.') }}</span>
+                <span>Giam gia ({{ rtrim(rtrim(number_format((float) $discountPercent, 1), '0'), '.') }}%):</span>
+                <span>-{{ number_format(((float) $discountAmount), 0, ',', '.') }}</span>
             </div>
         @endif
         <div class="row grand">
             <span>TONG CONG:</span>
-            <span>{{ number_format($subtotal, 0, ',', '.') }} d</span>
+            <span>{{ number_format($grandTotal, 0, ',', '.') }} d</span>
         </div>
-        @if($isPaid)
+        @if ($isPaid)
             <div class="row">
                 <span>Thanh toan:</span>
                 <span>{{ $payLabel }}</span>
@@ -129,7 +137,7 @@
 
     {{-- ====== Footer ====== --}}
     <div class="footer-note">
-        @if($isPaid)
+        @if ($isPaid)
             <div class="bold">Cam on quy khach!</div>
             <div class="xsmall">Hen gap lai quy khach lan sau.</div>
         @else
