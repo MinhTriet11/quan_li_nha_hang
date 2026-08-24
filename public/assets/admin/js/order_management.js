@@ -464,10 +464,28 @@ function transferTable() {
 
 // ==================== Merge Table ====================
 function openMergeModal() {
+
     if (!currentOrder) {
         alert('Vui lòng chọn bàn có order trước!');
         return;
     }
+
+    let result = true;
+
+    const statusOrderDetail = orderItemsList.querySelectorAll('.order-item-status');
+    statusOrderDetail.forEach((detail) => {
+        if(detail.dataset.statusId == 0 || detail.dataset.statusId == 1 ){
+            result = false;
+        }
+    })
+
+    console.log(statusOrderDetail)
+
+    if(!result){
+        alert('Vui lòng đợi chế biến xong');
+        return;
+    }
+
 
     mergeTableId = null;
     loadAvailableTablesForMerge();
@@ -512,7 +530,6 @@ function renderMergeTableSelection(tables) {
 
 function selectTableForMerge(element) {
     mergeTableId = parseInt(element.dataset.id);
-    console.log(mergeTableId)
 
     document.querySelectorAll('#mergeTableGrid .table-select-card').forEach(card => {
         card.classList.remove('selected');
@@ -521,10 +538,13 @@ function selectTableForMerge(element) {
 }
 
 function mergeTable() {
+    
+
     if (!mergeTableId) {
         alert('Vui lòng chọn bàn gộp vào');
         return;
     }
+    
 
     const orderId = document.getElementById('currentOrderId').value;
     if (!orderId) {
@@ -575,7 +595,7 @@ function openPaymentModal() {
     let result = true;
 
     statusOrderDetail.forEach((detail) => {
-        if(detail.dataset.statusId == 0){
+        if(detail.dataset.statusId == 0 || detail.dataset.statusId == 1 ){
             result = false
         }
     })

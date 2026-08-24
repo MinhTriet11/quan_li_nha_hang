@@ -180,7 +180,13 @@ function validatorRules(formElement , url = '', type = '') {
                 }, {});
 
                 if(formElement.id === "formCreateBook"){
-                var btn = formElement.querySelector('.btn').disabled = true;
+                    var btn = formElement.querySelector('.btn').disabled = true;
+                }
+
+                var btn = formElement.querySelector('.btn-login')??null;
+                if(btn){
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 }
 
                 if (formElement.id === "formLoginAdmin") {
@@ -204,6 +210,8 @@ function validatorRules(formElement , url = '', type = '') {
                                 
                             } else if (data.status === 'error') {
                                 toastr.error(data.message, "Lỗi");
+                                btn.disabled = false;
+                                btn.innerHTML = 'Đăng nhập';
                             }
                         })
                         .catch((error) => {

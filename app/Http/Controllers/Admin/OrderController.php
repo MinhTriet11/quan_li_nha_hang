@@ -324,8 +324,9 @@ class OrderController extends Controller
             ->where('id_table', '!=', $excludeId);
 
         if ($serving) {
-            // Lấy bàn đang phục vụ (cho gộp bàn)
-            $query->where('status', 2);
+            $query->whereHas('orders', function ($q) {
+            $q->where('status', 2);
+        });
         } else {
             // Lấy bàn trống (cho chuyển bàn)
             $query->where('status', 0);
@@ -493,13 +494,66 @@ class OrderController extends Controller
     {
         $request->validate([
             'from_order_id' => 'required|exists:orders,id_order',
-            'to_order_id' => 'required|exists:orders,id_order'
+            'to_order_id' => 'required|exists:tables,id_table'
         ]);
 
         $fromOrder = Order::findOrFail($request->from_order_id);
-        $toOrder = Order::where('id_table', $request->to_order_id)
-                        ->where('status', 0)
+        $toTable = Table::findOrFail($request->to_order_id);
+
+        // Validate: chỉ cho phép gộp khi TẤT CẢ món đều đã ra (status = 2)
+        // status order_detail: 0 = chờ, 1 = đang nấu, 2 = xong, 3 = hủy
+        $unfinishedFrom = OrderDetail::where('id_order', $fromOrder->id_order)
+            ->whereIn('status', [0, 1])
+            ->exists();
+        if ($unfinishedFrom) {
+            $pending = OrderDetail::where('id_order', $fromOrder->id_order)
+                ->whereIn('status', [0, 1])
+                ->with('menuItem')
+                ->get();
+            $names = $pending->map(function ($d) {
+                return $d->menuItem->name ?? "Món #{$d->id_food}";
+            })->implode(', ');
+            return response()->json([
+                'success' => false,
+                'message' => "Bàn nguồn còn món chưa hoàn tất, không thể gộp: {$names}"
+            ], 422);
+        }
+
+        // Tìm order của bàn đích (chỉ lấy order đã hoàn tất status=2)
+        $toOrder = Order::where('id_table', $toTable->id_table)
+                        ->where('status', 2)
                         ->first();
+
+        // Nếu bàn đích chưa có order hoàn tất, tạo mới
+        if (!$toOrder) {
+            $toOrder = Order::create([
+                'id_br'     => $toTable->id_br,
+                'id_table'  => $toTable->id_table,
+                'id_user'   => auth()->id(),
+                'id_cus'    => null,
+                'order_time' => Carbon::now(),
+                'status'    => 2,
+                'note'      => ''
+            ]);
+        }
+
+        // Validate bàn đích cũng phải có toàn món đã ra (nếu có order sẵn)
+        $unfinishedTo = OrderDetail::where('id_order', $toOrder->id_order)
+            ->whereIn('status', [0, 1])
+            ->exists();
+        if ($unfinishedTo) {
+            $pending = OrderDetail::where('id_order', $toOrder->id_order)
+                ->whereIn('status', [0, 1])
+                ->with('menuItem')
+                ->get();
+            $names = $pending->map(function ($d) {
+                return $d->menuItem->name ?? "Món #{$d->id_food}";
+            })->implode(', ');
+            return response()->json([
+                'success' => false,
+                'message' => "Bàn đích còn món chưa hoàn tất, không thể gộp: {$names}"
+            ], 422);
+        }
 
         // Di chuyển các món từ order cũ sang order mới
         $fromDetails = OrderDetail::where('id_order', $fromOrder->id_order)->get();
@@ -525,10 +579,8 @@ class OrderController extends Controller
         if ($fromTable) {
             $fromTable->status = 0;
             $fromTable->save();
+            $fromOrder->delete();
         }
-
-        // $fromOrder->status = 0; // Hủy
-        // $fromOrder->save();
 
         return response()->json([
             'success' => true,
