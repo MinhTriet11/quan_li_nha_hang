@@ -45,7 +45,7 @@ class BillController extends Controller
             $query->where('status', (int) $request->status);
         }
 
-        $bills = $query->orderBy('id_bill', 'desc')->paginate(10)->withQueryString();
+        $bills = $query->orderBy('pay_time', 'desc')->paginate(10)->withQueryString();
         $branches = Branch::orderBy('name')->get();
 
         return view('admin.pages.bills', compact('bills', 'branches'));

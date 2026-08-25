@@ -42,7 +42,7 @@ class ExportReceiptController extends Controller
             $query->where('id_ex', 'like', "%{$search}%");
         }
 
-        $receipts = $query->orderBy('id_ex', 'desc')->paginate(10)->withQueryString();
+        $receipts = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
         $branches = Branch::where('status', 1)->orderBy('name')->get();
 
         return view('admin.pages.export_receipts', compact('receipts', 'branches'));

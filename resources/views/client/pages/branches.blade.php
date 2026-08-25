@@ -16,7 +16,7 @@
         <div class="branches-grid">
             @foreach($branches as $branch)
             <article class="branch-card">
-                <img class="branch-image" src="{{ asset('assets/clients/image/' . ($branch->image ?? 'bg011.jpeg')) }}" alt="Cơ sở Mây Nướng {{ $branch->name }}" loading="lazy">
+                <img class="branch-image" src="{{ asset($branch->image) }}" alt="Cơ sở Mây Nướng {{ $branch->name }}" loading="lazy">
                 <h2><i class="fa-solid fa-location-dot"></i> {{ $branch->name }}</h2>
                 <p><i class="fa-solid fa-map-marker-alt"></i> {{ $branch->address }}</p>
                 <a class="branch-map-link" href="{{ $branch->location ?? '#' }}" target="_blank" rel="noreferrer">

@@ -35,8 +35,8 @@
                                         <div class="form-group">
                                             <label for="status">Trạng thái <span class="text-danger">*</span></label>
                                             <select class="form-control" id="status" name="status" rules="required">
-                                                <option value="0" {{ $branch->status == 0 ? 'selected' : '' }}>Đang hoạt động</option>
-                                                <option value="1" {{ $branch->status == 1 ? 'selected' : '' }}>Ngưng hoạt động</option>
+                                                <option value="1" {{ $branch->status == 1 ? 'selected' : '' }}>Đang hoạt động</option>
+                                                <option value="0" {{ $branch->status == 0 ? 'selected' : '' }}>Ngưng hoạt động</option>
                                             </select>
                                             <span class="form-message"></span>
                                         </div>
@@ -68,7 +68,7 @@
                                                 </div>
                                             @endif
                                             <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
-                                            <small class="form-text text-muted">Để trống nếu không muốn thay đổi. jpg, jpeg, png. Tối đa 2MB.</small>
+                                            <small class="form-text text-muted">Để trống nếu không muốn thay đổi. jpg, jpeg, png. Tối đa 3MB.</small>
                                         </div>
                                     </div>
                                 </div>

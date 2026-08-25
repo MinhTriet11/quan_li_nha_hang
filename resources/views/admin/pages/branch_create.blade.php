@@ -35,8 +35,8 @@
                                         <div class="form-group">
                                             <label for="status">Trạng thái <span class="text-danger">*</span></label>
                                             <select class="form-control" id="status" name="status" rules="required">
-                                                <option value="0">Đang hoạt động</option>
-                                                <option value="1">Ngưng hoạt động</option>
+                                                <option value="1">Đang hoạt động</option>
+                                                <option value="0">Ngưng hoạt động</option>
                                             </select>
                                             <span class="form-message"></span>
                                         </div>
@@ -63,7 +63,7 @@
                                         <div class="form-group">
                                             <label for="image">Ảnh chi nhánh</label>
                                             <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
-                                            <small class="form-text text-muted">jpg, jpeg, png. Tối đa 2MB.</small>
+                                            <small class="form-text text-muted">jpg, jpeg, png. Tối đa 3MB.</small>
                                         </div>
                                     </div>
                                 </div>

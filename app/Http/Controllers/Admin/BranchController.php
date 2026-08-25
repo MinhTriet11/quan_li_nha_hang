@@ -26,7 +26,7 @@ class BranchController extends Controller
             $query->where('status', $request->status);
         }
 
-        $branches = $query->orderBy('name')->paginate(10);
+        $branches = $query->orderBy('name', 'asc')->paginate(10);
 
         return view('admin.pages.branches', compact('branches'));
     }
@@ -44,7 +44,7 @@ class BranchController extends Controller
                 'address' => 'required|string|max:255',
                 'location'=> 'required|string|max:255',
                 'status'  => 'required|in:0,1',
-                'image'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                'image'   => 'nullable|image|mimes:jpg,jpeg,png|max:3072',
             ], [
                 'name.required'    => 'Tên chi nhánh là bắt buộc',
                 'name.unique'      => 'Tên chi nhánh đã tồn tại',
@@ -53,7 +53,7 @@ class BranchController extends Controller
                 'status.required'  => 'Vui lòng chọn trạng thái',
                 'image.image'      => 'File phải là hình ảnh',
                 'image.mimes'      => 'Ảnh phải có định dạng jpg, jpeg hoặc png',
-                'image.max'        => 'Ảnh không được vượt quá 2MB',
+                'image.max'        => 'Ảnh không được vượt quá 3MB',
             ]);
 
             $data = [
@@ -112,7 +112,7 @@ class BranchController extends Controller
                 'address' => 'required|string|max:255',
                 'location'=> 'required|string|max:255',
                 'status'  => 'required|in:0,1',
-                'image'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                'image'   => 'nullable|image|mimes:jpg,jpeg,png|max:3072',
             ], [
                 'name.required'    => 'Tên chi nhánh là bắt buộc',
                 'name.unique'      => 'Tên chi nhánh đã tồn tại',
@@ -121,7 +121,7 @@ class BranchController extends Controller
                 'status.required'  => 'Vui lòng chọn trạng thái',
                 'image.image'      => 'File phải là hình ảnh',
                 'image.mimes'      => 'Ảnh phải có định dạng jpg, jpeg hoặc png',
-                'image.max'        => 'Ảnh không được vượt quá 2MB',
+                'image.max'        => 'Ảnh không được vượt quá 3MB',
             ]);
 
             $branch->name     = $request->name;
@@ -154,7 +154,7 @@ class BranchController extends Controller
         try {
             $branch = Branch::findOrFail($id);
 
-            if ($branch->status == 1) {
+            if ($branch->status == 0) {
                 $this->deleteImage($branch->image);
                 $branch->delete();
                 return redirect()->route('admin.branch')->with('success', 'Xóa chi nhánh thành công');

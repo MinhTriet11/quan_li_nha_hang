@@ -41,7 +41,7 @@ class TransferController extends Controller
             $query->where('id_tran', 'like', "%{$search}%");
         }
 
-        $transfers = $query->orderBy('id_tran', 'desc')->paginate(10)->withQueryString();
+        $transfers = $query->orderBy('created_at')->paginate(10)->withQueryString();
         $branches = Branch::orderBy('name')->get();
 
         return view('admin.pages.transfer', compact('transfers', 'branches'));

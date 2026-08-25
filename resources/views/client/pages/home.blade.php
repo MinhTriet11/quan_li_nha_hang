@@ -95,7 +95,7 @@
         </div>
         <div class="list-img w-full d-flex">
             @foreach ( $branchesImage as $value )
-                <img class="img-item mx-2" src="{{ asset('assets/clients/image/'. $value->image)}}" alt="">
+                <img class="img-item mx-2" src="{{ asset($value->image) }}" alt="">
             @endforeach
         </div>
         <div class="more-branch w-full text-center">

@@ -123,7 +123,7 @@
                                                 <form action="{{ route('admin.branch.destroy', $branch->id_br) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="{{ $branch->status == 0 ? 'Chỉ có thể xóa chi nhánh ngưng hoạt động' : 'Xóa' }}" onclick="return confirm('Bạn có chắc chắn muốn xóa chi nhánh này?')" {{ $branch->status == 0 ? 'disabled' : '' }}>
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="{{ $branch->status == 1 ? 'Chỉ có thể xóa chi nhánh ngưng hoạt động' : 'Xóa' }}" onclick="return confirm('Bạn có chắc chắn muốn xóa chi nhánh này?')" {{ $branch->status == 1 ? 'disabled' : '' }}>
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>

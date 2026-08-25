@@ -381,6 +381,7 @@ function validatorRules(formElement , url = '', type = '') {
                     if (hasFileInput) {
                         // Use FormData for forms with file upload
                         const formData = new FormData(formElement);
+                        // Spoof PUT method for Laravel (works for both file and non-file updates)
                         formData.append('_method', 'PUT');
                         fetch(url, {
                             method: "POST",

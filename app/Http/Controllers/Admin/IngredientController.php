@@ -22,7 +22,7 @@ class IngredientController extends Controller
             $query->where('status', $request->status);
         }
 
-        $ingredients = $query->orderBy('id_ingre', 'desc')->paginate(10)->withQueryString();
+        $ingredients = $query->orderBy('name')->paginate(10)->withQueryString();
 
         return view('admin.pages.ingredient', compact('ingredients'));
     }

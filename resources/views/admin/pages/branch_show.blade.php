@@ -53,7 +53,7 @@
                                     <tr>
                                         <th>Trạng thái</th>
                                         <td>
-                                            @if($branch->status == 0)
+                                            @if($branch->status == 1)
                                                 <span class="badge badge-success">Đang hoạt động</span>
                                             @else
                                                 <span class="badge badge-warning">Ngưng hoạt động</span>

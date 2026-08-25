@@ -52,7 +52,7 @@ class UserController extends Controller
             $query->where('id_role', $request->id_role);
         }
 
-        $users = $query->orderBy('id_user', 'desc')->paginate(10);
+        $users = $query->orderBy('name')->paginate(10);
         $roles = Role::all();
 
         // dd($roles);

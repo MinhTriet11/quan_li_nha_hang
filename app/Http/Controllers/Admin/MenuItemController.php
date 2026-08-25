@@ -36,7 +36,7 @@ class MenuItemController extends Controller
             $query->where('status', $request->status);
         }
 
-        $menuItems = $query->orderBy('id_food', 'desc')->paginate(10);
+        $menuItems = $query->orderBy('name')->paginate(10);
         $categories = Category::all();
 
         return view('admin.pages.menu_items', compact('menuItems', 'categories'));

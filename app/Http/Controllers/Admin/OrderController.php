@@ -30,8 +30,8 @@ class OrderController extends Controller
     // Hiển thị giao diện chọn bàn theo chi nhánh
     public function index(Request $request)
     {
-        $branches = $this->availableBranches();
-        $selectedBranch = $this->currentBranchId($request);
+        $branches = $this->availableBranches(); //lay chi nhanh neu user duoc gan id_br
+        $selectedBranch = $this->currentBranchId($request); //dung de selected theo chi nhanh dang chon
 
         $tables = [];
         $categories = [];
@@ -68,7 +68,7 @@ class OrderController extends Controller
             $query->where('name', 'like', '%' . $search . '%');
         }
 
-        $menuItems = $query->get();
+        $menuItems = $query->orderBy('name')->get();
 
         return response()->json([
             'data' => $menuItems

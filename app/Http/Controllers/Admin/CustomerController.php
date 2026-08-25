@@ -27,7 +27,7 @@ class CustomerController extends Controller
             $query->where('status', $request->status);
         }
 
-        $customers = $query->orderBy('id_cus', 'desc')->paginate(10);
+        $customers = $query->orderBy('name')->paginate(10);
 
         return view('admin.pages.customers', compact('customers'));
     }
